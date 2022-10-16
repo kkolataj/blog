@@ -58,15 +58,31 @@ class DemoCron extends Command
         // Guzzle fetch
         $client = new Client(['verify' => false]);
 
-        $res = $client->request('GET', 'https://api.nbp.pl/api/exchangerates/rates/c/usd/2022-10-14/?format=json',['verify' => false]);
+        $res = $client->request(
+            'GET',
+            'https://api.nbp.pl/api/exchangerates/rates/c/usd/2022-10-14/?format=json');
 
-        if ($res->getStatusCode() == 200) { // 200 OK
-            $response_data = $res->getBody()->getContents();
-            \Log::info("RESPONSE!", $response_data);
+        if ($res->getStatusCode() == 200) {
+            $content = $res->getBody()->getContents();
+            $array = json_decode($content, true);
+            $rates = $array['rates'][0]['ask'];
+
+            \Log::info("_____________________________________________________________________");
+
+            if ($rates > 1) {
+                \Log::info('More than 1');
+            }
+            if ($rates < 1) {
+                \Log::info('Less than 1');
+            }
+            if ($rates === 5.0368) {
+                \Log::info('Is equal to 5.0368');
+            } else {
+                \Log::info($rates);
+            }
+
         } else {
             \Log::info("ERROR HERE!");
         }
-
-        \Log::info("Cron is working fine!");
     }
 }
